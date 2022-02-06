@@ -10,4 +10,4 @@ See the [dist/](./dist/) directory for executables to run on Windows, Mac, or Li
 
 ## Code
 
-The game is written in [Processing](https://processing.org).
+The game is written in [p5.js](https://p5js.org).
