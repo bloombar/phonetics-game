@@ -74,6 +74,9 @@ function draw() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  window.letters.forEach(letter => {
+    letter.reposition()
+  })
 }
 
 function mouseMoved() {
@@ -175,14 +178,13 @@ class Letter {
     this.shape = [LETTER_SIZE, LETTER_SIZE] // width, height
     this.dragging = false;
     this.inTimeline = false;
-    this.setPosition()
-
-  }
-
-  setPosition() {
+    this.position = []
+    this.xFactor = 0.5; // position as fraction of full width
+    this.yFactor = 0.5; // position as fraction of full height
+    // random start position
     const xPos = parseFloat(Math.random() * window.windowWidth - window.MARGIN*2 - window.LETTER_SIZE*2) + window.MARGIN*2 + window.LETTER_SIZE*2;
     const yPos = parseFloat(Math.random() * window.windowHeight*1/2 - window.MARGIN*2) + window.MARGIN*2;
-    this.position = [xPos, yPos]
+    this.move(xPos, yPos)
   }
 
   isCollision(xCoord, yCoord) {
@@ -208,8 +210,15 @@ class Letter {
     //console.log("moving " + this.text);
     this.position[0] = mouseX - this.shape[0]/2;
     this.position[1] = mouseY - this.shape[1]/2;
+    this.xFactor = this.position[0] / windowWidth // position as fraction of full width
+    this.yFactor = this.position[1] / windowHeight // position as fraction of full height
   }
   
+  reposition() {
+    console.log(`reponsition`)
+    this.move(this.xFactor * windowWidth, this.yFactor * windowHeight)
+  }
+
   stop() {
     this.bgColor = window.bgColorFailure;
   }

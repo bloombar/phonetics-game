@@ -4,10 +4,6 @@ Squares containing letters appear randomly all over the screen. Players can clic
 
 ![phonetics game screenshot](./images/screenshot.png)
 
-## Executables
+## Play the game
 
-See the [dist/](./dist/) directory for executables to run on Windows, Mac, or Linux computers.
-
-## Code
-
-The game is written in [p5.js](https://p5js.org).
+The game is available to play online [here](https://bloombar.github.io/phonetics-game/).
