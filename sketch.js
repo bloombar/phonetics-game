@@ -80,17 +80,22 @@ function windowResized() {
 }
 
 function mouseMoved() {
+  let keepLooping = true
   letters.forEach(letter => {
+    if (!keepLooping) return
+
     if (letter.isDragging()) {
       // console.log(`dragging ${letter.text}`);
       cursor('move')
       letter.move(mouseX, mouseY);
+      keepLooping = false // breakish out of the loopish thing
     }
     else if (letter.isCollision(mouseX, mouseY)) {
       // hover effect
       // console.log(`hovering ${letter.text}`);
       cursor('copy')
       letter.hover(true)
+      keepLooping = false // breakish out of the loopish thing
     }
     else {
       // cursor('default')
