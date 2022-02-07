@@ -74,22 +74,40 @@ function draw() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  window.letters.forEach(letter => {
+    letter.reposition()
+  })
 }
 
 function mouseMoved() {
+  let keepLooping = true
+  let setSpecialCursor = false
   letters.forEach(letter => {
+    if (!keepLooping) return
+
     if (letter.isDragging()) {
-      //console.log("dragging " + letter.text);
+      // console.log(`dragging ${letter.text}`);
+      cursor('move')
+      setSpecialCursor = true
       letter.move(mouseX, mouseY);
+      keepLooping = false // breakish out of the loopish thing
     }
     else if (letter.isCollision(mouseX, mouseY)) {
       // hover effect
+      // console.log(`hovering ${letter.text}`);
+      cursor('pointer')
+      setSpecialCursor = true
       letter.hover(true)
+      keepLooping = false // breakish out of the loopish thing
     }
     else {
+      // cursor('default')
       letter.hover(false)
     }
   })
+  if (!setSpecialCursor) {
+    cursor('default')
+  }
 }
 
 function mousePressed() {
@@ -112,7 +130,7 @@ function mouseClicked() {
       letterClicked = true;
       // add to timeline, if present
       if (!letter.inTimeline && timeline.contains(letter)) {
-        console.log("adding " + letter.text);
+        // console.log("adding " + letter.text);
         letter.addToTimeline();
         //letter.play();
       }
@@ -122,16 +140,11 @@ function mouseClicked() {
       return false;
     }
     if (letter.isCollision(mouseX, mouseY)) {
-      // remove from end of array
-      window.letters = window.letters.filter((el, i, arr) => {
-        return el != letter
-      })
-      // place at end of array of letters for z-index effect
-      window.letters.push(letter) // place at end of array
+      letter.bringToFront()
       letterClicked = true;
       // remove from timeline, if present
       if (letter.inTimeline) {
-        console.log("removing " + letter.text);
+        // console.log("removing " + letter.text);
         letter.removeFromTimeline();
       }
       // start dragging
@@ -175,14 +188,11 @@ class Letter {
     this.shape = [LETTER_SIZE, LETTER_SIZE] // width, height
     this.dragging = false;
     this.inTimeline = false;
-    this.setPosition()
-
-  }
-
-  setPosition() {
+    this.position = []
+    // random start position
     const xPos = parseFloat(Math.random() * window.windowWidth - window.MARGIN*2 - window.LETTER_SIZE*2) + window.MARGIN*2 + window.LETTER_SIZE*2;
     const yPos = parseFloat(Math.random() * window.windowHeight*1/2 - window.MARGIN*2) + window.MARGIN*2;
-    this.position = [xPos, yPos]
+    this.move(xPos, yPos)
   }
 
   isCollision(xCoord, yCoord) {
@@ -192,6 +202,16 @@ class Letter {
   }
 
   hover(active) {
+    if (active) {
+      // remove from end of array
+      const thisLetter = this
+      window.letters = window.letters.filter((el, i, arr) => {
+        return el != thisLetter
+      })
+      // place at end of array of letters for z-index effect
+      window.letters.push(thisLetter) // place at end of array
+    }
+
     this.bgColor = (active) ? window.fgColorInfo : window.bgColorFailure;
   }
 
@@ -204,12 +224,34 @@ class Letter {
     window.text(this.text,  this.position[0]+this.shape[0]/2, this.position[1]+this.shape[1]/2);
   }
   
-  move(mouseX, mouseY) {
+  move(xCoord, yCoord) {
+    // keep in bounds
+    xCoord = (xCoord < MARGIN) ? MARGIN : xCoord
+    xCoord = (xCoord > windowWidth - MARGIN) ? windowWidth - MARGIN : xCoord
+    yCoord = (yCoord < MARGIN) ? MARGIN : yCoord
+    yCoord = (yCoord > windowHeight - MARGIN) ? windowHeight - MARGIN : yCoord
     //console.log("moving " + this.text);
-    this.position[0] = mouseX - this.shape[0]/2;
-    this.position[1] = mouseY - this.shape[1]/2;
+    this.position[0] = xCoord - this.shape[0]/2;
+    this.position[1] = yCoord - this.shape[1]/2;
+    this.xFactor = xCoord / windowWidth // position as fraction of full width
+    this.yFactor = yCoord / windowHeight // position as fraction of full height
   }
   
+  reposition() {
+    // console.log(`reposition by factors ${this.xFactor}, ${this.yFactor}`)
+    this.move(this.xFactor * windowWidth, this.yFactor * windowHeight)
+  }
+
+  bringToFront() {
+    const thisLetter = this
+    // remove this Letter from original array
+    window.letters = window.letters.filter( (el, i, arr) => { 
+      return el != thisLetter
+    })
+    window.letters.push(this); // add to end of arrray
+
+  }
+
   stop() {
     this.bgColor = window.bgColorFailure;
   }
@@ -299,7 +341,7 @@ class Timeline {
     fill(this.bgColor[0], this.bgColor[1], this.bgColor[2]);
     window.rect(this.position[0], this.position[1], this.shape[0], this.shape[1]);
     window.textAlign(LEFT, CENTER);
-    window.text("Click to pick up letters and place them in box. Click box to play.", this.position[0], this.position[1] - 15);
+    window.text("Click letters to place them within the white box and then press the SPACE key to speak them.", this.position[0], this.position[1] - 15);
   }
   
   sort() {
