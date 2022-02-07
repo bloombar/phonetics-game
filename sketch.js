@@ -82,14 +82,18 @@ function windowResized() {
 function mouseMoved() {
   letters.forEach(letter => {
     if (letter.isDragging()) {
-      //console.log("dragging " + letter.text);
+      // console.log(`dragging ${letter.text}`);
+      cursor('move')
       letter.move(mouseX, mouseY);
     }
     else if (letter.isCollision(mouseX, mouseY)) {
       // hover effect
+      // console.log(`hovering ${letter.text}`);
+      cursor('copy')
       letter.hover(true)
     }
     else {
+      // cursor('default')
       letter.hover(false)
     }
   })
@@ -125,12 +129,7 @@ function mouseClicked() {
       return false;
     }
     if (letter.isCollision(mouseX, mouseY)) {
-      // remove from end of array
-      window.letters = window.letters.filter((el, i, arr) => {
-        return el != letter
-      })
-      // place at end of array of letters for z-index effect
-      window.letters.push(letter) // place at end of array
+      letter.bringToFront()
       letterClicked = true;
       // remove from timeline, if present
       if (letter.inTimeline) {
@@ -194,6 +193,16 @@ class Letter {
   }
 
   hover(active) {
+    if (active) {
+      // remove from end of array
+      const thisLetter = this
+      window.letters = window.letters.filter((el, i, arr) => {
+        return el != thisLeter
+      })
+      // place at end of array of letters for z-index effect
+      window.letters.push(thisLetter) // place at end of array
+    }
+
     this.bgColor = (active) ? window.fgColorInfo : window.bgColorFailure;
   }
 
@@ -217,6 +226,16 @@ class Letter {
   reposition() {
     console.log(`reponsition`)
     this.move(this.xFactor * windowWidth, this.yFactor * windowHeight)
+  }
+
+  bringToFront() {
+    const thisLetter = this
+    // remove this Letter from original array
+    window.letters = window.letters.filter( (el, i, arr) => { 
+      return el != thisLetter
+    })
+    window.letters.push(this); // add to end of arrray
+
   }
 
   stop() {
