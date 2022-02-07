@@ -308,7 +308,7 @@ class Timeline {
     fill(this.bgColor[0], this.bgColor[1], this.bgColor[2]);
     window.rect(this.position[0], this.position[1], this.shape[0], this.shape[1]);
     window.textAlign(LEFT, CENTER);
-    window.text("Click to pick up letters and place them in box. Click box to play.", this.position[0], this.position[1] - 15);
+    window.text("Click letters to place them within the white box and then press the SPACE key to speak them.", this.position[0], this.position[1] - 15);
   }
   
   sort() {
