@@ -202,16 +202,7 @@ class Letter {
   }
 
   hover(active) {
-    if (active) {
-      // remove from end of array
-      const thisLetter = this
-      window.letters = window.letters.filter((el, i, arr) => {
-        return el != thisLetter
-      })
-      // place at end of array of letters for z-index effect
-      window.letters.push(thisLetter) // place at end of array
-    }
-
+    // if (active) this.bringToFront()
     this.bgColor = (active) ? window.fgColorInfo : window.bgColorFailure;
   }
 
