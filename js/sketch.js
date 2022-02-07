@@ -46,7 +46,7 @@ function setup() {
   textAlign(CENTER, CENTER);
 
   // create the timeline
-  window.timeline = new Timeline(this, parseInt(windowHeight/3))
+  window.timeline = new Timeline(this, 0.33)
   
   // create the letters
   const ls = available_letters.split(" ")
@@ -313,13 +313,13 @@ class Letter {
 
 class Timeline {
   
-  constructor(app, height) {
+  constructor(app, yFactor) {
     this.app = app;
     this.text = null;
     this.fgColor = window.fgColorInvert;
     this.bgColor = window.bgColorInvert;
-    this.position = [window.MARGIN, window.windowHeight - height - window.MARGIN]
-    this.shape = [window.windowWidth - window.MARGIN*2, height]
+    this.yFactor = yFactor // proportion of window height to consume
+    this.resize()
     this.letters = []
     this.playing = false;
     this.currentLetterIndex = 0;
@@ -334,7 +334,15 @@ class Timeline {
 
   resize() {
     //fit timeline within window size
-    this.shape = [window.windowWidth - window.MARGIN*2, height]
+    this.shape = [windowWidth - MARGIN*2, this.yFactor*windowHeight - MARGIN]
+
+    // keep larger than letters
+    const minHeight = LETTER_SIZE*2
+    this.shape[1] = (this.shape[1] < minHeight) ? minHeight : this.shape[1]
+
+    // position at bottom
+    this.position = [MARGIN, windowHeight - this.shape[1] - MARGIN]
+
   }
 
   draw() {
