@@ -379,7 +379,7 @@ class Timeline {
     )
     window.textAlign(LEFT, CENTER)
     window.text(
-      "Click letters to place them within the white box and then press the SPACE key to speak them.",
+      "Click letters to pick them up.  Click again to put them down.  Place them in the white box and hit the SPACE BAR key to speak them.",
       this.position[0],
       this.position[1] - 15
     )
